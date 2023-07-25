@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  resources-db:
+    container_name: resources-db
+    image: postgres:15.2-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: resources-service
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "pass"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /var/postgres
+    restart: unless-stopped
+  songs-db:
+    container_name: songs-db
+    image: postgres:15.2-alpine
+    expose:
+      - "5431"
+    ports:
+      - "5431:5431"
+    command: -p 5431
+    environment:
+      POSTGRES_DB: song-service
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "pass"
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /var/postgres
+    restart: unless-stopped
