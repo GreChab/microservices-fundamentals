@@ -1,0 +1,31 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: resource-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/resources-service
+    username: "postgres"
+    password: "pass"
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format-sql: 'true'
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: 'true'
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  sql:
+    init:
+      mode: always
+
+song:
+  service:
+    base:
+      path: http://localhost:8081/songs
