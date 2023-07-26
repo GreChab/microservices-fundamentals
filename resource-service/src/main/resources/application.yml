@@ -4,11 +4,6 @@ server:
 spring:
   application:
     name: resource-service
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/resources-service
-    username: "postgres"
-    password: "pass"
   jpa:
     properties:
       hibernate:

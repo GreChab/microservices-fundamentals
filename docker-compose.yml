@@ -6,9 +6,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: resources-service
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "pass"
+      POSTGRES_DB: ${RESOURCES_PG_DB_DATABASE}
+      POSTGRES_USER: ${RESOURCES_PG_DB_USER}
+      POSTGRES_PASSWORD: ${RESOURCES_PG_DB_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - /var/postgres
@@ -22,10 +22,33 @@ services:
       - "5431:5431"
     command: -p 5431
     environment:
-      POSTGRES_DB: song-service
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "pass"
+      POSTGRES_DB: ${SONGS_PG_DB_DATABASE}
+      POSTGRES_USER: ${SONGS_PG_DB_USER}
+      POSTGRES_PASSWORD: ${SONGS_PG_DB_PASSWORD}
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - /var/postgres
     restart: unless-stopped
+  resource-service:
+    image: epamgrzegorzchabiera/resource-service:1.0
+    container_name: resource-service
+    environment:
+      - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
+      - spring_datasource_username=${RESOURCES_SPRING_DATASOURCE_USERNAME}
+      - spring_datasource_password=${RESOURCES_SPRING_DATASOURCE_PASSWORD}
+      - song_service_base_path=${SONG_SERVICE_BASE_PATH}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - resources-db
+  song-service:
+    image: epamgrzegorzchabiera/song-service:1.0
+    container_name: song-service
+    environment:
+      - spring_datasource_url=${SONGS_SPRING_DATASOURCE_URL}
+      - spring_datasource_username=${SONGS_SPRING_DATASOURCE_USERNAME}
+      - spring_datasource_password=${SONGS_SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "8081:8081"
+    depends_on:
+      - songs-db
