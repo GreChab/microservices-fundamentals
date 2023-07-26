@@ -4,11 +4,6 @@ server:
 spring:
   application:
     name: songs-service
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5431/song-service
-    username: "postgres"
-    password: "pass"
   jpa:
     properties:
       hibernate:
