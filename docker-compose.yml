@@ -1,5 +1,13 @@
 version: '3.7'
 services:
+  eureka-server:
+    container_name: eureka-server
+    image: epamgrzegorzchabiera/eureka-server:1.0
+    ports:
+      - "8761:8761"
+    environment:
+      - eureka_instance_hostname=eureka-server
+      - eureka_client_service-url_defaultZone=${EUREKA_CLIENT_SERVICE_URL}
   resources-db:
     container_name: resources-db
     image: postgres:15.2-alpine
@@ -30,25 +38,30 @@ services:
       - /var/postgres
     restart: unless-stopped
   resource-service:
-    image: epamgrzegorzchabiera/resource-service:1.0
+    image: epamgrzegorzchabiera/resource-service:2.0
     container_name: resource-service
     environment:
       - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
       - spring_datasource_username=${RESOURCES_SPRING_DATASOURCE_USERNAME}
       - spring_datasource_password=${RESOURCES_SPRING_DATASOURCE_PASSWORD}
-      - song_service_base_path=${SONG_SERVICE_BASE_PATH}
+      - song_service_name=SONG-SERVICE
+      - song_service_path=songs
+      - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
     ports:
       - "8080:8080"
     depends_on:
       - resources-db
+      - eureka-server
   song-service:
-    image: epamgrzegorzchabiera/song-service:1.0
+    image: epamgrzegorzchabiera/song-service:2.0
     container_name: song-service
     environment:
       - spring_datasource_url=${SONGS_SPRING_DATASOURCE_URL}
       - spring_datasource_username=${SONGS_SPRING_DATASOURCE_USERNAME}
       - spring_datasource_password=${SONGS_SPRING_DATASOURCE_PASSWORD}
+      - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
     ports:
       - "8081:8081"
     depends_on:
       - songs-db
+      - eureka-server

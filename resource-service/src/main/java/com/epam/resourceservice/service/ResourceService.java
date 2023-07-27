@@ -4,6 +4,7 @@ import ch.qos.logback.core.util.Duration;
 import com.epam.resourceservice.dto.Mp3Details;
 import com.epam.resourceservice.model.ResourceEntity;
 import com.epam.resourceservice.repository.ResourceRepository;
+import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.time.DurationFormatUtils;
@@ -11,6 +12,7 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -29,8 +31,15 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
     private final RestTemplate restTemplate;
 
-    @Value("${song.service.base.path}")
-    private String songServiceBasePath;
+    @Autowired
+    EurekaClient eurekaClient;
+
+    @Value("${song.service.name}")
+    private String songServiceName;
+
+    @Value("${song.service.path}")
+    private String songServicePath;
+
 
     @SneakyThrows
     public ResourceEntity addResource(MultipartFile file) {
@@ -43,7 +52,7 @@ public class ResourceService {
         ResourceEntity savedResourceEntity = resourceRepository.save(resourceEntity);
         Mp3Details mp3Details = extractMetadata(file);
         mp3Details.setResourceId(savedResourceEntity.getId());
-        restTemplate.postForEntity(songServiceBasePath, new HttpEntity<>(mp3Details), String.class);
+        restTemplate.postForEntity(getSongServiceUrl(), new HttpEntity<>(mp3Details), String.class);
         return savedResourceEntity;
     }
 
@@ -80,5 +89,10 @@ public class ResourceService {
         return DurationFormatUtils.formatDuration(
                 Duration.buildBySeconds(Double.parseDouble(s)).getMilliseconds(),
                 "mm:ss");
+    }
+
+
+    private String getSongServiceUrl() {
+        return eurekaClient.getNextServerFromEureka(songServiceName, false).getHomePageUrl() + songServicePath;
     }
 }
