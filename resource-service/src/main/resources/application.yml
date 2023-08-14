@@ -20,7 +20,11 @@ spring:
     init:
       mode: always
 
-song:
-  service:
-    base:
-      path: http://localhost:8081/songs
+config:
+  aws:
+    region: us-east-1
+    s3:
+      bucket-name: resources
+      url: http://localhost:4566
+      access-key: localstack
+      secret-key: localstack

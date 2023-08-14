@@ -1,23 +1,14 @@
 package com.epam.resourceservice.service;
 
-import ch.qos.logback.core.util.Duration;
-import com.epam.resourceservice.dto.Mp3Details;
+import com.amazonaws.services.s3.model.S3Object;
 import com.epam.resourceservice.model.ResourceEntity;
 import com.epam.resourceservice.repository.ResourceRepository;
 import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.mp3.Mp3Parser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,10 +20,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ResourceService {
     private final ResourceRepository resourceRepository;
-    private final RestTemplate restTemplate;
-
-    @Autowired
-    EurekaClient eurekaClient;
+    private final AmazonS3Service s3Service;
+    private final EurekaClient eurekaClient;
 
     @Value("${song.service.name}")
     private String songServiceName;
@@ -40,57 +29,36 @@ public class ResourceService {
     @Value("${song.service.path}")
     private String songServicePath;
 
-
     @SneakyThrows
     public ResourceEntity addResource(MultipartFile file) {
         if (Objects.isNull(file) || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        ResourceEntity resourceEntity = ResourceEntity.builder()
-                .withAudioData(file.getBytes())
-                .build();
-        ResourceEntity savedResourceEntity = resourceRepository.save(resourceEntity);
-        Mp3Details mp3Details = extractMetadata(file);
-        mp3Details.setResourceId(savedResourceEntity.getId());
-        restTemplate.postForEntity(getSongServiceUrl(), new HttpEntity<>(mp3Details), String.class);
-        return savedResourceEntity;
+        ResourceEntity resourceEntity = s3Service.saveFile(file, file.getOriginalFilename());
+        return resourceRepository.save(resourceEntity);
     }
 
+    @SneakyThrows
     public byte[] getResource(Long id) {
         ResourceEntity resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return resource.getAudioData();
+        S3Object s3Object = s3Service.getFile(resource.getFileName());
+        return s3Object.getObjectContent().readAllBytes();
     }
 
     public List<Long> deleteAllByIds(List<Long> ids) {
         List<ResourceEntity> resourceEntities = resourceRepository.findAllById(ids);
+
+        resourceEntities.stream()
+                .map(ResourceEntity::getFileName)
+                .forEach(s3Service::removeFile);
+
         List<Long> foundIds = resourceEntities.stream()
                 .map(ResourceEntity::getId)
                 .collect(Collectors.toList());
         resourceRepository.deleteAllById(foundIds);
         return foundIds;
     }
-
-    @SneakyThrows
-    private Mp3Details extractMetadata(MultipartFile file) {
-        Metadata metadata = new Metadata();
-        new Mp3Parser().parse(file.getInputStream(), new BodyContentHandler(), metadata, new ParseContext());
-
-        return Mp3Details.builder()
-                .withName(metadata.get("dc:title"))
-                .withArtist(metadata.get("xmpDM:artist"))
-                .withAlbum(metadata.get("xmpDM:album"))
-                .withYear(Integer.valueOf(metadata.get("xmpDM:releaseDate")))
-                .withLength(formatSecondsToMinutesAndSeconds(metadata.get("xmpDM:duration")))
-                .build();
-    }
-
-    private static String formatSecondsToMinutesAndSeconds(String s) {
-        return DurationFormatUtils.formatDuration(
-                Duration.buildBySeconds(Double.parseDouble(s)).getMilliseconds(),
-                "mm:ss");
-    }
-
 
     private String getSongServiceUrl() {
         return eurekaClient.getNextServerFromEureka(songServiceName, false).getHomePageUrl() + songServicePath;
