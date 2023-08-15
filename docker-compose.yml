@@ -56,7 +56,7 @@ services:
       - /var/postgres
     restart: unless-stopped
   resource-service:
-    image: epamgrzegorzchabiera/resource-service:3.0
+    image: epamgrzegorzchabiera/resource-service:4.0
     container_name: resource-service
     environment:
       - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
@@ -68,10 +68,12 @@ services:
       - config_aws_s3_url=http://s3-service:4566
       - config_aws_s3_access-key=localstack
       - config_aws_s3_secret-key=localstack
-      - config_aws_s3_bucketName=resources
+      - config_aws_s3_bucket-name=resources
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
+      - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - "8080:8080"
+      - "5005:5005"
     depends_on:
       - resources-db
       - eureka-server

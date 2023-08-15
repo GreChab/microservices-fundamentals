@@ -21,7 +21,7 @@ public class AwsS3Config {
     private String url;
     @Value("${config.aws.region}")
     private String region;
-    @Value("${config.aws.s3.bucket-name")
+    @Value("${config.aws.s3.bucket-name}")
     private String bucketName;
 
     @Bean
