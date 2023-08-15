@@ -18,6 +18,15 @@ services:
     volumes:
       - "/c/s3:/var/lib/localstack"
       - "/c/s3/docker.sock:/var/run/docker.sock"
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   eureka-server:
     container_name: eureka-server
     image: epamgrzegorzchabiera/eureka-server:1.0
@@ -56,7 +65,7 @@ services:
       - /var/postgres
     restart: unless-stopped
   resource-service:
-    image: epamgrzegorzchabiera/resource-service:4.0
+    image: epamgrzegorzchabiera/resource-service:5.0
     container_name: resource-service
     environment:
       - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
@@ -70,6 +79,9 @@ services:
       - config_aws_s3_secret-key=localstack
       - config_aws_s3_bucket-name=resources
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_USERNAME=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=rabbitmq
       - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - "8080:8080"
@@ -90,3 +102,14 @@ services:
     depends_on:
       - songs-db
       - eureka-server
+  resource-processor-service:
+    image: epamgrzegorzchabiera/resources-processor-service:1.0
+    container_name: resource-processor-service
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_USERNAME=rabbitmq
+      - SPRING_RABBITMQ_PASSWORD=rabbitmq
+      - resource_service_name=resource-service
+      - resource_service_path=resources
+      - song_service_name=song-service
+      - song_service_path=songs

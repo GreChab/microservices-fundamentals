@@ -8,13 +8,14 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.apache.tika.sax.BodyContentHandler;
-import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayInputStream;
 
 public class Mp3MetadataExtractor {
     @SneakyThrows
-    public SongMetadata extractMetadata(MultipartFile file) {
+    public SongMetadata extractMetadata(byte[] file) {
         Metadata metadata = new Metadata();
-        new Mp3Parser().parse(file.getInputStream(), new BodyContentHandler(), metadata, new ParseContext());
+        new Mp3Parser().parse(new ByteArrayInputStream(file), new BodyContentHandler(), metadata, new ParseContext());
 
         return SongMetadata.builder()
                 .withName(metadata.get("dc:title"))

@@ -22,6 +22,7 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
     private final AmazonS3Service s3Service;
     private final EurekaClient eurekaClient;
+    private final RabbitMqService rabbitMqService;
 
     @Value("${song.service.name}")
     private String songServiceName;
@@ -35,6 +36,7 @@ public class ResourceService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         ResourceEntity resourceEntity = s3Service.saveFile(file, file.getOriginalFilename());
+        rabbitMqService.sendMessage(String.valueOf(resourceEntity.getId()));
         return resourceRepository.save(resourceEntity);
     }
 
