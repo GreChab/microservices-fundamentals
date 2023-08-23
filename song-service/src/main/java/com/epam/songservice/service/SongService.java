@@ -18,8 +18,7 @@ public class SongService {
     private final SongRepository songRepository;
 
     public Song addSong(Song song) {
-        if (song == null || song.getName().isBlank() || song.getArtist().isBlank() || song.getAlbum().isBlank()
-                || song.getLength().isBlank() || song.getYear() == null || song.getResourceId() == null) {
+        if (!isSongMetadataCorrect(song)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         log.info("Song-service: song received. Id: " + song.getId() +  ", artist: " + song.getArtist() + ", name: " + song.getName());
@@ -38,5 +37,19 @@ public class SongService {
                 .collect(Collectors.toList());
         songRepository.deleteAllById(foundIds);
         return foundIds;
+    }
+
+    public boolean isSongMetadataCorrect(Song song) {
+        return song != null &&
+                song.getName() != null &&
+                !song.getName().isBlank() &&
+                song.getArtist() != null &&
+                !song.getArtist().isBlank() &&
+                song.getAlbum() != null &&
+                !song.getAlbum().isBlank() &&
+                song.getLength() != null &&
+                !song.getLength().isBlank() &&
+                song.getYear() != null &&
+                song.getResourceId() != null;
     }
 }
