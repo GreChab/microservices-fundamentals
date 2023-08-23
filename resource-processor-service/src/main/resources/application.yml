@@ -4,3 +4,6 @@ server:
 spring:
   application:
     name: resource-processor-service
+  kafka:
+    consumer:
+      bootstrap-servers: ${KAFKA-HOST}
