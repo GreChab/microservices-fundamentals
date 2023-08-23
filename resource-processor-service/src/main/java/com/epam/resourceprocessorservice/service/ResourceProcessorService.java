@@ -10,7 +10,7 @@ import io.github.resilience4j.retry.RetryConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,7 +18,6 @@ import java.time.Duration;
 
 @Slf4j
 @Service
-@RabbitListener(queues = "queue.A")
 @RequiredArgsConstructor
 public class ResourceProcessorService {
     private RestTemplate restTemplate;
@@ -26,8 +25,9 @@ public class ResourceProcessorService {
     private ResourceProcessorConfig config;
     private Mp3MetadataExtractor extractor;
 
+    @KafkaListener(topics = "songs", groupId = "resource.processor")
     public void receive(String id) {
-        log.info("Message received from queue: id=" + id);
+        log.info("Message received from topic: id=" + id);
         byte[] file = restTemplate.getForObject(getResourceServiceUrl() + "/" + id, byte[].class);
         SongMetadata songMetadata = extractor.extractMetadata(file);
         songMetadata.setResourceId(Integer.valueOf(id));
@@ -43,7 +43,7 @@ public class ResourceProcessorService {
 
     private Retry retry() {
         Retry retry = Retry.of("resourceProcessorService", RetryConfig.custom()
-                .maxAttempts(3)
+                .maxAttempts(10)
                 .waitDuration(Duration.ofSeconds(3))
                 .build());
 

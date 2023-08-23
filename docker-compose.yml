@@ -18,15 +18,31 @@ services:
     volumes:
       - "/c/s3:/var/lib/localstack"
       - "/c/s3/docker.sock:/var/run/docker.sock"
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+  zookeeper:
+    image: confluentinc/cp-zookeeper
+    container_name: zookeeper
     environment:
-      - RABBITMQ_DEFAULT_USER=rabbitmq
-      - RABBITMQ_DEFAULT_PASS=rabbitmq
+      ZOOKEEPER_CLIENT_PORT: 2181
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+  kafka:
+    image: confluentinc/cp-kafka
+    container_name: kafka_single_broker
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://:9091,EXTERNAL://localhost:19091
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_ADVERTISED_HOST_NAME: kafka_single_broker
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+    ports:
+      - "19091:19091"
+      - "9091:9091"
+    depends_on:
+      - zookeeper
   eureka-server:
     container_name: eureka-server
     image: epamgrzegorzchabiera/eureka-server:1.0
@@ -79,9 +95,7 @@ services:
       - config_aws_s3_secret-key=localstack
       - config_aws_s3_bucket-name=resources
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_USERNAME=rabbitmq
-      - SPRING_RABBITMQ_PASSWORD=rabbitmq
+      - KAFKA-HOST=kafka_single_broker:9091
       - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - "8080:8080"
@@ -106,9 +120,7 @@ services:
     image: epamgrzegorzchabiera/resources-processor-service:1.0
     container_name: resource-processor-service
     environment:
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - SPRING_RABBITMQ_USERNAME=rabbitmq
-      - SPRING_RABBITMQ_PASSWORD=rabbitmq
+      - KAFKA-HOST=kafka_single_broker:9091
       - resource_service_name=resource-service
       - resource_service_path=resources
       - song_service_name=song-service

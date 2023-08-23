@@ -6,6 +6,7 @@ import com.epam.resourceservice.repository.ResourceRepository;
 import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,13 +17,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResourceService {
     private final ResourceRepository resourceRepository;
     private final AmazonS3Service s3Service;
     private final EurekaClient eurekaClient;
-    private final RabbitMqService rabbitMqService;
+    private final KafkaService kafkaService;
 
     @Value("${song.service.name}")
     private String songServiceName;
@@ -36,7 +38,8 @@ public class ResourceService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
         ResourceEntity resourceEntity = s3Service.saveFile(file, file.getOriginalFilename());
-        rabbitMqService.sendMessage(String.valueOf(resourceEntity.getId()));
+        kafkaService.sendMessage(String.valueOf(resourceEntity.getId()));
+        log.info("Kafka service: message sent, id=" + resourceEntity.getId());
         return resourceRepository.save(resourceEntity);
     }
 
