@@ -81,7 +81,7 @@ services:
       - /var/postgres
     restart: unless-stopped
   resource-service:
-    image: epamgrzegorzchabiera/resource-service:5.0
+    image: epamgrzegorzchabiera/resource-service:6.0
     container_name: resource-service
     environment:
       - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
@@ -104,7 +104,7 @@ services:
       - resources-db
       - eureka-server
   song-service:
-    image: epamgrzegorzchabiera/song-service:2.0
+    image: epamgrzegorzchabiera/song-service:3.0
     container_name: song-service
     environment:
       - spring_datasource_url=${SONGS_SPRING_DATASOURCE_URL}
@@ -117,7 +117,7 @@ services:
       - songs-db
       - eureka-server
   resource-processor-service:
-    image: epamgrzegorzchabiera/resources-processor-service:1.0
+    image: epamgrzegorzchabiera/resource-processor-service:2.0
     container_name: resource-processor-service
     environment:
       - KAFKA-HOST=kafka_single_broker:9091
