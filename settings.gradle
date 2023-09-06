@@ -2,4 +2,6 @@ rootProject.name = 'microservices-fundamentals'
 include 'resource-service'
 include 'song-service'
 include 'resource-processor-service'
+include 'eureka-server'
+include 'api-gateway'
 
