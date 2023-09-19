@@ -117,7 +117,7 @@ services:
       - songs-db
       - eureka-server
   resource-processor-service:
-    image: epamgrzegorzchabiera/resource-processor-service:2.0
+    image: epamgrzegorzchabiera/resource-processor-service:3.0
     container_name: resource-processor-service
     environment:
       - KAFKA-HOST=${KAFKA-HOST}
@@ -125,3 +125,17 @@ services:
       - resource_service_path=${RESOURCE_SERVICE_PATH}
       - song_service_name=${SONG_SERVICE_NAME}
       - song_service_path=${SONG_SERVICE_PATH}
+      - api_gateway_service_name=${API_GATEWAY_SERVICE_NAME}
+    depends_on:
+      - eureka-server
+  api-gateway:
+    image: epamgrzegorzchabiera/api-gateway:1.0
+    container_name: api-gateway
+    environment:
+      - song_service_name=${SONG_SERVICE_NAME}
+      - resource_service_name=${RESOURCE_SERVICE_NAME}
+      - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
+    ports:
+      - "80:80"
+    depends_on:
+      - eureka-server

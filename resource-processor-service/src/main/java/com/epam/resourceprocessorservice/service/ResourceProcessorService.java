@@ -53,12 +53,12 @@ public class ResourceProcessorService {
 
 
     private String getSongServiceUrl() {
-        return eurekaClient.getNextServerFromEureka(config.getSongServiceName(), false)
+        return eurekaClient.getNextServerFromEureka(config.getApiGatewayName(), false)
                 .getHomePageUrl() + config.getSongServicePath();
     }
 
     private String getResourceServiceUrl() {
-        return eurekaClient.getNextServerFromEureka(config.getResourceServiceName(), false)
+        return eurekaClient.getNextServerFromEureka(config.getApiGatewayName(), false)
                 .getHomePageUrl() + config.getResourceServicePath();
     }
 }
