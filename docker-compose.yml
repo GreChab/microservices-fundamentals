@@ -81,7 +81,7 @@ services:
       - /var/postgres
     restart: unless-stopped
   resource-service:
-    image: epamgrzegorzchabiera/resource-service:6.0
+    image: epamgrzegorzchabiera/resource-service:7.0
     container_name: resource-service
     environment:
       - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
@@ -93,9 +93,13 @@ services:
       - config_aws_s3_url=${CONFIG_AWS_S3_URL}
       - config_aws_s3_access-key=${CONFIG_AWS_S3_ACCESS_KEY}
       - config_aws_s3_secret-key=${CONFIG_AWS_S3_SECRET_KEY}
-      - config_aws_s3_bucket-name=${CONFIG_AWS_S3_BUCKET_NAME}
+      - config_aws_s3_staging_bucket-name=${CONFIG_AWS_S3_STAGING_BUCKET_NAME}
+      - config_aws_s3_perm_bucket-name=${CONFIG_AWS_S3_PERM_BUCKET_NAME}
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
       - KAFKA-HOST=${KAFKA-HOST}
+      - storage_service_name=${STORAGE_SERVICE_NAME}
+      - storage_service_path=${STORAGE_SERVICE_PATH}
+      - api_gateway_service_name=${API_GATEWAY_SERVICE_NAME}
       - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - "8080:8080"
@@ -117,7 +121,7 @@ services:
       - songs-db
       - eureka-server
   resource-processor-service:
-    image: epamgrzegorzchabiera/resource-processor-service:3.0
+    image: epamgrzegorzchabiera/resource-processor-service:4.0
     container_name: resource-processor-service
     environment:
       - KAFKA-HOST=${KAFKA-HOST}
@@ -125,17 +129,49 @@ services:
       - resource_service_path=${RESOURCE_SERVICE_PATH}
       - song_service_name=${SONG_SERVICE_NAME}
       - song_service_path=${SONG_SERVICE_PATH}
+      - resource_service_processing_path=${RESOURCE_SERVICE_PROCESSING_PATH}
       - api_gateway_service_name=${API_GATEWAY_SERVICE_NAME}
     depends_on:
       - eureka-server
   api-gateway:
-    image: epamgrzegorzchabiera/api-gateway:1.0
+    image: epamgrzegorzchabiera/api-gateway:2.0
     container_name: api-gateway
     environment:
       - song_service_name=${SONG_SERVICE_NAME}
       - resource_service_name=${RESOURCE_SERVICE_NAME}
+      - storage_service_name=${STORAGE_SERVICE_NAME}
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
     ports:
       - "80:80"
     depends_on:
       - eureka-server
+  storage-service:
+    image: epamgrzegorzchabiera/storage-service:1.0
+    container_name: storage-service
+    environment:
+      - spring_datasource_url=${STORAGE_SPRING_DATASOURCE_URL}
+      - spring_datasource_username=${STORAGE_SPRING_DATASOURCE_USERNAME}
+      - spring_datasource_password=${STORAGE_SPRING_DATASOURCE_PASSWORD}
+      - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
+      - server.port=8083
+    ports:
+      - "8083:8083"
+    depends_on:
+      - storage-db
+      - eureka-server
+  storage-db:
+    container_name: storage-db
+    image: postgres:15.2-alpine
+    expose:
+      - "5433"
+    ports:
+      - "5433:5433"
+    command: -p 5433
+    environment:
+      POSTGRES_DB: ${STORAGE_PG_DB_DATABASE}
+      POSTGRES_USER: ${STORAGE_PG_DB_USER}
+      POSTGRES_PASSWORD: ${STORAGE_PG_DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - /var/postgres
+    restart: unless-stopped

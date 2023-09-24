@@ -17,4 +17,6 @@ public class ResourceProcessorConfig {
     private String songServicePath;
     @Value("${api.gateway.service.name}")
     private String apiGatewayName;
+    @Value("${resource.service.processing.path}")
+    private String resourceServiceProcessingPath;
 }

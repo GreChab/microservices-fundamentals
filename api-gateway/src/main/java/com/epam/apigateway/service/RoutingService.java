@@ -19,6 +19,9 @@ public class RoutingService {
     @Value("${song.service.name}")
     private String songServiceName;
 
+    @Value("${storage.service.name}")
+    private String storageServiceName;
+
 
     public RoutingService(EurekaClient eurekaClient) {
         this.eurekaClient = eurekaClient;
@@ -47,6 +50,11 @@ public class RoutingService {
                 .route(p -> p
                         .method(HttpMethod.GET)
                         .and()
+                        .path("/processing/*")
+                        .uri(getServer(resourceServiceName) + "processing/*"))
+                .route(p -> p
+                        .method(HttpMethod.GET)
+                        .and()
                         .path("/songs/*")
                         .uri(getServer(songServiceName) + "songs/*"))
                 .route(p -> p
@@ -56,6 +64,11 @@ public class RoutingService {
                         .and()
                         .path("/songs")
                         .uri(getServer(songServiceName) + "songs"))
+                .route(p -> p
+                        .method(HttpMethod.GET)
+                        .and()
+                        .path("/storages")
+                        .uri(getServer(songServiceName) + "storages"))
                 .build();
     }
 

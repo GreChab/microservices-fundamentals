@@ -1,4 +1,4 @@
-package com.epam.resourceservice.model;
+package com.epam.storageservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,17 +6,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "t_resources")
 @Data
+@Entity
+@Table(name="t_storage")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(setterPrefix = "with")
-public class ResourceEntity {
+public class Storage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String fileName;
-    private String fileUrl;
-    private StorageType storageType;
+    Long id;
+    StorageType storageType;
+    String bucket;
+    String path;
 }
