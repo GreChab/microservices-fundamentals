@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/resource-processor-service" />
             <option value="$PROJECT_DIR$/resource-service" />
             <option value="$PROJECT_DIR$/song-service" />
+            <option value="$PROJECT_DIR$/storage-service" />
           </set>
         </option>
       </GradleProjectSettings>

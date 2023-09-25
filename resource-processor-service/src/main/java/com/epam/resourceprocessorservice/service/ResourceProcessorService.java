@@ -32,6 +32,7 @@ public class ResourceProcessorService {
         SongMetadata songMetadata = extractor.extractMetadata(file);
         songMetadata.setResourceId(Integer.valueOf(id));
         restTemplate.postForObject(getSongServiceUrl(), songMetadata, SongMetadata.class);
+        restTemplate.getForObject(getResourceServiceProcessingUrl(id), String.class);
     }
 
     @RabbitHandler
@@ -60,5 +61,10 @@ public class ResourceProcessorService {
     private String getResourceServiceUrl() {
         return eurekaClient.getNextServerFromEureka(config.getApiGatewayName(), false)
                 .getHomePageUrl() + config.getResourceServicePath();
+    }
+
+    private String getResourceServiceProcessingUrl(String id) {
+        return eurekaClient.getNextServerFromEureka(config.getApiGatewayName(), false)
+                .getHomePageUrl() + config.getResourceServiceProcessingPath() + "/" + id;
     }
 }

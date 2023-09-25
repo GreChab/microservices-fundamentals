@@ -12,21 +12,25 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/resources")
 public class ResourceController {
     private final ResourceService resourceService;
 
-    @PostMapping
+    @PostMapping("/resources")
     public ResponseEntity<Long> addResource(@RequestParam MultipartFile file) {
         return ResponseEntity.ok(resourceService.addResource(file).getId());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/resources/{id}")
     public ResponseEntity<Resource> getResource(@PathVariable("id") Long id) {
         return ResponseEntity.ok(new ByteArrayResource(resourceService.getResource(id)));
     }
 
-    @DeleteMapping
+    @GetMapping("/processing/{id}")
+    public ResponseEntity<Long> processResource(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(resourceService.processResource(id));
+    }
+
+    @DeleteMapping("/resources")
     public ResponseEntity<List<Long>> deleteResource(@RequestParam List<Long> ids) {
         return ResponseEntity.ok(resourceService.deleteAllByIds(ids));
     }
