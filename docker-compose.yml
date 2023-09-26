@@ -175,3 +175,32 @@ services:
     volumes:
       - /var/postgres
     restart: unless-stopped
+  elasticsearch:
+    image: elasticsearch:8.8.1
+    container_name: elk_elasticsearch
+    environment:
+      ELASTIC_CONTAINER: true
+      transport.host: localhost
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  kibana:
+    image: kibana:8.8.1
+    container_name: elk_kibana
+    environment:
+      ELASTIC_CONTAINER: true
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+  logstash:
+    image: logstash:8.8.1
+    container_name: elk_logstash
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    depends_on:
+      - elasticsearch
+    volumes:
+      - './logstash.yml:/usr/share/logstash/config/logstash.yml'
+      - './logstash.conf:/usr/share/logstash/pipeline/logstash.conf'
