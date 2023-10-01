@@ -131,7 +131,6 @@ services:
       - song_service_path=${SONG_SERVICE_PATH}
       - resource_service_processing_path=${RESOURCE_SERVICE_PROCESSING_PATH}
       - api_gateway_service_name=${API_GATEWAY_SERVICE_NAME}
-      - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
     depends_on:
       - eureka-server
   api-gateway:
