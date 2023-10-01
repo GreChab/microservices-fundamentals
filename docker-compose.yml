@@ -96,7 +96,7 @@ services:
       - config_aws_s3_staging_bucket-name=${CONFIG_AWS_S3_STAGING_BUCKET_NAME}
       - config_aws_s3_perm_bucket-name=${CONFIG_AWS_S3_PERM_BUCKET_NAME}
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
-      - KAFKA-HOST=${KAFKA-HOST}
+      - KAFKA-HOST=${KAFKA_HOST}
       - storage_service_name=${STORAGE_SERVICE_NAME}
       - storage_service_path=${STORAGE_SERVICE_PATH}
       - api_gateway_service_name=${API_GATEWAY_SERVICE_NAME}
@@ -124,7 +124,7 @@ services:
     image: epamgrzegorzchabiera/resource-processor-service:4.0
     container_name: resource-processor-service
     environment:
-      - KAFKA-HOST=${KAFKA-HOST}
+      - KAFKA-HOST=${KAFKA_HOST}
       - resource_service_name=${RESOURCE_SERVICE_NAME}
       - resource_service_path=${RESOURCE_SERVICE_PATH}
       - song_service_name=${SONG_SERVICE_NAME}
@@ -132,8 +132,8 @@ services:
       - resource_service_processing_path=${RESOURCE_SERVICE_PROCESSING_PATH}
       - api_gateway_service_name=${API_GATEWAY_SERVICE_NAME}
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
-    depends_on:
-      - eureka-server
+#    depends_on:
+#      - eureka-server
   api-gateway:
     image: epamgrzegorzchabiera/api-gateway:2.0
     container_name: api-gateway
@@ -147,14 +147,14 @@ services:
     depends_on:
       - eureka-server
   storage-service:
-    image: epamgrzegorzchabiera/storage-service:2.0
+    image: epamgrzegorzchabiera/storage-service:3.0
     container_name: storage-service
     environment:
       - spring_datasource_url=${STORAGE_SPRING_DATASOURCE_URL}
       - spring_datasource_username=${STORAGE_SPRING_DATASOURCE_USERNAME}
       - spring_datasource_password=${STORAGE_SPRING_DATASOURCE_PASSWORD}
-      - spring_security_oauth2_resourceserver_jwt_issuer-uri=${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER-URI}
-      - spring_security_oauth2_resourceserver_jwt_jwk-set-uri=${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI}
+      - spring_security_oauth2_resourceserver_jwt_issuer-uri=${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+      - spring_security_oauth2_resourceserver_jwt_jwk-set-uri=${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
       - server.port=8083
     ports:
