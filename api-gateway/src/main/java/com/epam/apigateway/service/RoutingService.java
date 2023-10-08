@@ -68,7 +68,7 @@ public class RoutingService {
                         .method(HttpMethod.GET)
                         .and()
                         .path("/storages")
-                        .uri(getServer(songServiceName) + "storages"))
+                        .uri(getServer(storageServiceName) + "storages"))
                 .build();
     }
 

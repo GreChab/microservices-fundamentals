@@ -14,7 +14,7 @@ public class Breaker {
     private Breaker() {
     }
 
-    public static CircuitBreaker circuitBreaker() {
+    public CircuitBreaker circuitBreaker() {
         CircuitBreaker circuitBreaker = CircuitBreaker.of("storage service", CircuitBreakerConfig.custom()
                 .failureRateThreshold(50)
                 .minimumNumberOfCalls(3)

@@ -28,19 +28,22 @@ public class AmazonS3Service {
     private final AwsS3Config awsS3Config;
     private final RestTemplate restTemplate;
     private final EurekaClient eurekaClient;
+    private final Breaker breaker;
 
     @Autowired
-    public AmazonS3Service(AmazonS3 s3Client, AwsS3Config awsS3Config, RestTemplate restTemplate, EurekaClient eurekaClient) {
+    public AmazonS3Service(AmazonS3 s3Client, AwsS3Config awsS3Config, RestTemplate restTemplate,
+                           EurekaClient eurekaClient, Breaker breaker) {
         this.s3Client = s3Client;
         this.awsS3Config = awsS3Config;
         this.restTemplate = restTemplate;
         this.eurekaClient = eurekaClient;
+        this.breaker = breaker;
     }
 
     @SneakyThrows
     public ResourceEntity saveFileToStaging(MultipartFile file, String fileName) {
         Decorators.ofRunnable(this::createBuckets)
-                .withCircuitBreaker(Breaker.circuitBreaker())
+                .withCircuitBreaker(breaker.circuitBreaker())
                 .run();
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(file.getContentType());

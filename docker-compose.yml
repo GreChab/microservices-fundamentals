@@ -81,7 +81,7 @@ services:
       - /var/postgres
     restart: unless-stopped
   resource-service:
-    image: epamgrzegorzchabiera/resource-service:7.0
+    image: epamgrzegorzchabiera/resource-service:8.0
     container_name: resource-service
     environment:
       - spring_datasource_url=${RESOURCES_SPRING_DATASOURCE_URL}
@@ -135,7 +135,7 @@ services:
 #    depends_on:
 #      - eureka-server
   api-gateway:
-    image: epamgrzegorzchabiera/api-gateway:2.0
+    image: epamgrzegorzchabiera/api-gateway:3.0
     container_name: api-gateway
     environment:
       - song_service_name=${SONG_SERVICE_NAME}
