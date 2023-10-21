@@ -6,7 +6,7 @@ import com.epam.songservice.service.SongService
 import spock.lang.Specification
 import spock.lang.Subject
 
-class SongServiceTest extends Specification{
+class SongServiceTest extends Specification {
     private static final String EMPTY_STRING = ''
     private static final String ANY = 'any'
     private final SongRepository repository = Mock(SongRepository)
@@ -37,9 +37,9 @@ class SongServiceTest extends Specification{
 
         where:
         name         | artist | album | length | year | resourceId
-        ''           | ANY    | ANY   | ANY    | 1    | 1
-        EMPTY_STRING | ANY    | ANY   | ANY    | 1    | 1
-        null         | ANY    | ANY   | ANY    | 1    | 1
+        ''           | ANY    | ANY   | ANY    | "1"  | 1
+        EMPTY_STRING | ANY    | ANY   | ANY    | "1"  | 1
+        null         | ANY    | ANY   | ANY    | "1"  | 1
     }
 
     def songWithCorrectMetadata() {
@@ -48,12 +48,12 @@ class SongServiceTest extends Specification{
                 .withArtist("sample_artist")
                 .withAlbum("sample_album")
                 .withLength("sample_length")
-                .withYear(2000)
+                .withYear("2000")
                 .withResourceId(1)
                 .build()
     }
 
-    def songWithCustomMetadata(String name, String artist, String album, String length, Long year, Long resourceId) {
+    def songWithCustomMetadata(String name, String artist, String album, String length, String year, Long resourceId) {
         return Song.builder()
                 .withName(name)
                 .withArtist(artist)

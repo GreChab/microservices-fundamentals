@@ -21,8 +21,7 @@ public class Song {
     String artist;
     String album;
     String length;
-    @Column(name = "resource_id")
     Long resourceId;
-    Long year;
+    String year;
 }
 

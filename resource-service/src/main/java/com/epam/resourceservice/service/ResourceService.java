@@ -42,6 +42,8 @@ public class ResourceService {
         resourceRepository.findById(id)
                 .ifPresent(resourceEntity -> {
                     s3Service.processToPermBucket(resourceEntity.getFileName());
+                    S3Object s3Object = s3Service.getFileFromPerm(resourceEntity.getFileName());
+                    resourceEntity.setFileUrl(s3Object.getObjectContent().getHttpRequest().getURI().toString());
                     resourceEntity.setStorageType(StorageType.PERMANENT);
                     resourceRepository.save(resourceEntity);
                     log.info("Resource service: File '" + resourceEntity.getFileName() + "' was moved to perm bucket");
@@ -54,7 +56,7 @@ public class ResourceService {
     public byte[] getResource(Long id) {
         ResourceEntity resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        S3Object s3Object = s3Service.getFile(resource.getFileName());
+        S3Object s3Object = s3Service.getFileFromStaging(resource.getFileName());
         return s3Object.getObjectContent().readAllBytes();
     }
 

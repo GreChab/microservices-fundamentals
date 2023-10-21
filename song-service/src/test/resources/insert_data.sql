@@ -2,7 +2,7 @@ create schema xxx;
 
 set schema xxx;
 
-create table songs
+create table t_songs
 (
     `id`          INTEGER PRIMARY KEY AUTO_INCREMENT,
     `name`        varchar,
@@ -10,8 +10,8 @@ create table songs
     `album`       varchar,
     `length`      varchar,
     `resource_id` INTEGER,
-    `year`        INTEGER
+    `year`        varchar
 );
 
-insert into songs (`id`, `name`, `artist`, `album`, `length`, `resource_id`, `year`)
-values (1, 'sample name', 'sample artist', 'sample album', 'sample length', 1, 1111);
+insert into t_songs (`id`, `name`, `artist`, `album`, `length`, `resource_id`, `year`)
+values (1, 'sample name', 'sample artist', 'sample album', 'sample length', 1, '1111');

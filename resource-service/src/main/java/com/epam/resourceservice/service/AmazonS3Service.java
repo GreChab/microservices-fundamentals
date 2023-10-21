@@ -61,8 +61,12 @@ public class AmazonS3Service {
     }
 
     @SneakyThrows
-    public S3Object getFile(String fileName) {
+    public S3Object getFileFromStaging(String fileName) {
         return s3Client.getObject(stagingBucketName, fileName);
+    }
+
+    public S3Object getFileFromPerm(String fileName) {
+        return s3Client.getObject(permanentBucketName, fileName);
     }
 
     public void removeFile(String fileName) {

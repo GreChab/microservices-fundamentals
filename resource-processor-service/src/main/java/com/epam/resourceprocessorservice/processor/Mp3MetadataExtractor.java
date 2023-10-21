@@ -8,9 +8,11 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.mp3.Mp3Parser;
 import org.apache.tika.sax.BodyContentHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
 
+@Component
 public class Mp3MetadataExtractor {
     @SneakyThrows
     public SongMetadata extractMetadata(byte[] file) {
@@ -21,7 +23,7 @@ public class Mp3MetadataExtractor {
                 .withName(metadata.get("dc:title"))
                 .withArtist(metadata.get("xmpDM:artist"))
                 .withAlbum(metadata.get("xmpDM:album"))
-                .withYear(Integer.valueOf(metadata.get("xmpDM:releaseDate")))
+                .withYear(metadata.get("xmpDM:releaseDate"))
                 .withLength(formatSecondsToMinutesAndSeconds(metadata.get("xmpDM:duration")))
                 .build();
     }

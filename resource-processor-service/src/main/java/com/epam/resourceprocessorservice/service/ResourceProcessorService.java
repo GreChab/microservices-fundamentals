@@ -7,9 +7,8 @@ import com.netflix.discovery.EurekaClient;
 import io.github.resilience4j.decorators.Decorators;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -18,24 +17,23 @@ import java.time.Duration;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ResourceProcessorService {
     private RestTemplate restTemplate;
     private EurekaClient eurekaClient;
     private ResourceProcessorConfig config;
     private Mp3MetadataExtractor extractor;
 
-    @KafkaListener(topics = "songs", groupId = "resource.processor")
     public void receive(String id) {
         log.info("Message received from topic: id=" + id);
         byte[] file = restTemplate.getForObject(getResourceServiceUrl() + "/" + id, byte[].class);
         SongMetadata songMetadata = extractor.extractMetadata(file);
-        songMetadata.setResourceId(Integer.valueOf(id));
+        songMetadata.setResourceId(Long.valueOf(id));
         restTemplate.postForObject(getSongServiceUrl(), songMetadata, SongMetadata.class);
         restTemplate.getForObject(getResourceServiceProcessingUrl(id), String.class);
     }
 
-    @RabbitHandler
+    @KafkaListener(topics = "songs", groupId = "resource.processor")
     public void receiveWithRetry(String id) {
         Decorators.ofRunnable(() -> receive(id))
                 .withRetry(retry())

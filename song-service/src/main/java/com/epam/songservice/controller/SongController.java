@@ -9,17 +9,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(name = "/songs")
+@RequestMapping("/songs")
 @RequiredArgsConstructor
 public class SongController {
     private final SongService songService;
 
     @PostMapping
-    public ResponseEntity<Long> addSong(@RequestBody Song song) {
-        return ResponseEntity.ok(songService.addSong(song).getId());
+    public ResponseEntity<Song> addSong(@RequestBody Song song) {
+        return ResponseEntity.ok(songService.addSong(song));
     }
 
-    @GetMapping
+    @GetMapping("/{id}")
     public ResponseEntity<Song> getSongById(@PathVariable Long id) {
         return ResponseEntity.ok(songService.findSongById(id));
     }
