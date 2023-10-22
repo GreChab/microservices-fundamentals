@@ -48,6 +48,7 @@ public class StorageServiceApplication implements CommandLineRunner {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers( "/actuator/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/storages").permitAll()
                         .requestMatchers(HttpMethod.POST, "/storages").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/storages").hasRole("ADMIN")

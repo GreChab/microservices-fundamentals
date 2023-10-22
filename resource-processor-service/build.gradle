@@ -30,6 +30,12 @@ dependencies {
     implementation 'org.apache.tika:tika-core:2.8.0'
     implementation 'org.apache.tika:tika-parsers:2.8.0'
     implementation 'org.apache.tika:tika-parsers-standard-package:2.8.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    implementation 'io.micrometer:micrometer-core'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation platform('org.junit:junit-bom:5.9.1')
