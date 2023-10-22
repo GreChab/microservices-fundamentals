@@ -24,7 +24,6 @@ public class ResourceService {
     private final AmazonS3Service s3Service;
     private final KafkaService kafkaService;
 
-    @SneakyThrows
     public ResourceEntity addResource(MultipartFile file) {
         if (Objects.isNull(file) || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

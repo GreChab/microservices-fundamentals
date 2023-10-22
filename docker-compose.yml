@@ -134,6 +134,7 @@ services:
       - eureka.client.serviceUrl.defaultZone=${EUREKA_CLIENT_SERVICE_URL}
       - JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008"
     ports:
+      - "8086:8086"
       - "5008:5008"
   #    depends_on:
 #      - eureka-server
