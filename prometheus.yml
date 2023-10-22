@@ -20,7 +20,7 @@ scrape_configs:
   - job_name: 'resource-processor-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['resource-processor-service:8082']
+      - targets: ['resource-processor-service:8086']
 
   - job_name: 'api-gateway'
     metrics_path: '/actuator/prometheus'
